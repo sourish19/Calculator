@@ -8,4 +8,8 @@
   .numberBttn {
     @apply flex h-20 w-20 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#3E3E3E] text-4xl;
   }
+
+  .equalsToBttn {
+    @apply flex h-20 w-20 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#3E3E3E] text-4xl;
+  }
 }

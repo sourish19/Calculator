@@ -1,113 +1,101 @@
 const operationBttn = document.querySelectorAll(".operationBttn");
 const numberBttn = document.querySelectorAll(".numberBttn");
-const displayValues = document.querySelector(".displayValues");
+const equalsToBttn = document.querySelector(".equalsToBttn");
+const clearBttn = document.querySelector(".clearBttn");
 
-let valuesToDisplay = "";
-let operand1 = "";
-let operand2 = "";
-let operator = null;
+let addStringNumbers = "";
+let operator = "";
+let operandVal = 0;
+let counter = 0;
+let result = 0;
+let flag = false;
 
-// FUNCTION TO DISPLAY THE VALUES IN THE SCREEN
-const displayOperation = (e) => {
-  valuesToDisplay = valuesToDisplay + e.innerText;
-  displayValues.innerText = valuesToDisplay;
-};
+const trackOperands = [];
 
-//CLEAR DISPLAY FUNCTION
-const clearDisplay = () => {
-  operand1 = "";
-  operand2 = "";
-  operator = null;
-  valuesToDisplay = "";
-};
+numberBttn.forEach((e) => {
+  e.addEventListener("click", handleNumberBttnFn);
+});
 
-//  + - * / OPERATION
-const operation = (operator, operand1, operand2) => {
-  if (!operand1 || !operand2) {
+operationBttn.forEach((e) => {
+  e.addEventListener("click", handleOperationBttnFn);
+});
+
+equalsToBttn.addEventListener("click", handleResultOperation);
+
+clearBttn.addEventListener("click", clearOutFn);
+
+function handleNumberBttnFn(e) {
+  if (flag) return;
+  const number = e.target.innerHTML;
+  addStringNumbers += number;
+}
+
+function handleOperationBttnFn(e) {
+  if (addStringNumbers) {
+    trackOperands.push(Number(addStringNumbers));
+    counter++;
+  }
+  if (trackOperands.length > 1) {
+    counter++;
+    arithmeticOperation();
+  }
+  operator = e.target.innerHTML;
+
+  flag = false;
+  addStringNumbers = "";
+  arithmeticOperation();
+}
+
+function arithmeticOperation() {
+  if (counter > 1) {
+    // console.log(counter, operator, trackOperands);
+    counter = 1;
     switch (operator) {
       case "+":
-        return operand1 + operand2;
+        result = trackOperands.reduce((val1, val2) => {
+          return val1 + val2;
+        });
+        break;
       case "-":
-        return operand1 - operand2;
+        result = trackOperands.reduce((val1, val2) => {
+          return val1 - val2;
+        });
+        break;
       case "*":
-        return operand1 * operand2;
+        result = trackOperands.reduce((val1, val2) => {
+          return val1 * val2;
+        });
+        break;
       case "/":
-        return operand1 / operand2;
+        result = trackOperands.reduce((val1, val2) => {
+          return val1 / val2;
+        });
+        break;
     }
-  }
-};
-
-const undoValues = () => {
-  console.log("operand2", operand2);
-
-  if (!operand2 == "") {
-    console.log("hi");
-
-    operand2 = operand2.slice(0, -1);
-    console.log("operand2 after", operand2);
-
-    valuesToDisplay = valuesToDisplay.slice(0, -1);
-    displayValues.innerText = valuesToDisplay;
-  }
-  console.log("operand1", operand1);
-  console.log("operator", operator);
-  console.log("valueToDisplay", valuesToDisplay);
-};
-
-//  + - * / DETERMIN OPERATOR
-const arithmaticValue = (e) => {
-  if (e.innerText === "") {
-    console.log(e.innerHTML);
-    undoValues();
-  } else if (e.innerText === "C") {
-    displayValues.innerHTML = "";
-    clearDisplay();
-  } else if (operand1 != "" && operator == null) {
-    operator = e.innerText;
-    displayOperation(e);
-  }
-};
-
-const operandValue = (e) => {
-  if (e.innerText === "=") {
-    let result = operation(operator, Number(operand1), Number(operand2));
+    operator = "";
+    trackOperands.length = [];
+    trackOperands.push(result);
     console.log(result);
-
-    displayValues.innerText = result;
-    clearDisplay();
-    result = null;
-  } else if (e.innerText == ".") {
-    if (operand1 != "" && !operand1.includes(".")) {
-      operand1 += e.innerText;
-      displayOperation(e);
-    }
-    if (operand2 != "" && !operand2.includes(".")) {
-      operand2 += e.innerText;
-      displayOperation(e);
-    }
-  } else if (operator != null && operand1 != "") {
-    operand2 += e.innerText;
-    displayOperation(e);
-  } else {
-    operand1 += e.innerText;
-    displayOperation(e);
   }
-};
+  return;
+}
 
-// DETERMINE OPERATOR EVENT
-operationBttn.forEach((e) => {
-  e.addEventListener("click", () => {
-    if (e.innerText === "") {
-      undoValues();
-    } else {
-      arithmaticValue(e);
-    }
-  });
-});
+function handleResultOperation() {
+  if (addStringNumbers && operator) {
+    trackOperands.push(Number(addStringNumbers));
+    counter++;
+    flag = true;
+    addStringNumbers = "";
+  }
+  arithmeticOperation();
+}
 
-// DETERMINE operand1 & operand2 VALUE
-numberBttn.forEach((e) => {
-  e.addEventListener("click", () => {
-    operandValue(e);
-  });
-});
+function clearOutFn() {
+  addStringNumbers = "";
+  operator = "";
+  operandVal = 0;
+  counter = 0;
+  result = 0;
+  flag = false;
+  trackOperands.length = [];
+}
