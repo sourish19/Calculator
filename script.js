@@ -2,15 +2,15 @@ const operationBttn = document.querySelectorAll(".operationBttn");
 const numberBttn = document.querySelectorAll(".numberBttn");
 const equalsToBttn = document.querySelector(".equalsToBttn");
 const clearBttn = document.querySelector(".clearBttn");
-
+const displayValues = document.querySelector(".displayValues");
+const trackOperands = [];
 let addStringNumbers = "";
 let operator = "";
 let operandVal = 0;
 let counter = 0;
 let result = 0;
 let flag = false;
-
-const trackOperands = [];
+let stringToDisplay = "";
 
 numberBttn.forEach((e) => {
   e.addEventListener("click", handleNumberBttnFn);
@@ -27,10 +27,18 @@ clearBttn.addEventListener("click", clearOutFn);
 function handleNumberBttnFn(e) {
   if (flag) return;
   const number = e.target.innerHTML;
+  if (number === "." && addStringNumbers.includes(".")) {
+    return;
+  }
   addStringNumbers += number;
+  displayFn(number);
 }
 
 function handleOperationBttnFn(e) {
+  if (isNaN(Number(addStringNumbers))) {
+    clearOutFn();
+    return;
+  }
   if (addStringNumbers) {
     trackOperands.push(Number(addStringNumbers));
     counter++;
@@ -40,7 +48,7 @@ function handleOperationBttnFn(e) {
     arithmeticOperation();
   }
   operator = e.target.innerHTML;
-
+  if (stringToDisplay) displayFn(operator);
   flag = false;
   addStringNumbers = "";
   arithmeticOperation();
@@ -48,7 +56,6 @@ function handleOperationBttnFn(e) {
 
 function arithmeticOperation() {
   if (counter > 1) {
-    // console.log(counter, operator, trackOperands);
     counter = 1;
     switch (operator) {
       case "+":
@@ -67,6 +74,10 @@ function arithmeticOperation() {
         });
         break;
       case "/":
+        if (trackOperands[1] === 0) {
+          clearOutFn();
+          return;
+        }
         result = trackOperands.reduce((val1, val2) => {
           return val1 / val2;
         });
@@ -74,8 +85,11 @@ function arithmeticOperation() {
     }
     operator = "";
     trackOperands.length = [];
+    result = parseFloat(result.toFixed(8));
     trackOperands.push(result);
-    console.log(result);
+    displayValues.innerHTML = "";
+    stringToDisplay = "";
+    displayFn(String(result));
   }
   return;
 }
@@ -98,4 +112,17 @@ function clearOutFn() {
   result = 0;
   flag = false;
   trackOperands.length = [];
+  displayValues.innerHTML = "";
+  stringToDisplay = "";
+  displayFn("");
+}
+
+function displayFn(str) {
+  const operandStr = "+-*/";
+  const lastChar = stringToDisplay.charAt(stringToDisplay.length - 1);
+  if (operandStr.includes(str) && operandStr.includes(lastChar)) {
+    stringToDisplay = stringToDisplay.replace(lastChar, "");
+  }
+  stringToDisplay += str;
+  displayValues.innerHTML = stringToDisplay;
 }
