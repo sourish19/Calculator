@@ -25,6 +25,7 @@ equalsToBttn.addEventListener("click", handleResultOperation);
 clearBttn.addEventListener("click", clearOutFn);
 
 function handleNumberBttnFn(e) {
+  if (stringToDisplay === "INVALID") stringToDisplay = "";
   if (flag) return;
   const number = e.target.innerHTML;
   if (number === "." && addStringNumbers.includes(".")) {
@@ -76,6 +77,7 @@ function arithmeticOperation() {
       case "/":
         if (trackOperands[1] === 0) {
           clearOutFn();
+          displayFn("INVALID");
           return;
         }
         result = trackOperands.reduce((val1, val2) => {
